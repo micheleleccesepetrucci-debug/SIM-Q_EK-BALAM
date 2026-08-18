@@ -609,7 +609,7 @@ const uiTranslations = {
         platTitleMatrix: "Matriz de Criticidad de la Plataforma (3x3)",
         platTitleStats: "Resultados de Simulación",
         platTitleMitigation: "Plan de Mitigación Recomendado",
-        platSubtitleMitigation: "Acciones requeridas para llevar la plataforma a un nivel de **Riesgo Bajo (Nivel 3)**",
+        platSubtitleMitigation: "Acciones requeridas para llevar la plataforma a un nivel de <strong>Riesgo Bajo (Nivel 3)</strong>",
         statProbPoints: "Score Condición",
         statProbLevel: "Probabilidad LoF",
         statConsFinal: "Exposición CoF",
@@ -658,7 +658,9 @@ const uiTranslations = {
         uploadZoneTitle: "Cargar Base de Datos (.xlsx)",
         uploadZoneSubtitle: "Arrastra o haz clic aquí",
         lblFooterSub: "SIM-Q RELIARISK v1.0",
-        lblSelectPlatform: "Seleccionar Plataforma a Simular:"
+        lblSelectPlatform: "Seleccionar Plataforma a Simular:",
+        btnSaveAnalysis: "💾 Guardar Análisis (.json)",
+        btnDownloadAnalysis: "⬇️ Descargar (.json)"
     },
     en: {
         title: "SIM-Q RELIARISK",
@@ -697,7 +699,7 @@ const uiTranslations = {
         platTitleMatrix: "Platform Criticality Matrix (3x3)",
         platTitleStats: "Simulation Results",
         platTitleMitigation: "Recommended Mitigation Plan",
-        platSubtitleMitigation: "Actions required to bring the platform to a **Low Risk (Level 3)** level",
+        platSubtitleMitigation: "Actions required to bring the platform to a <strong>Low Risk (Level 3)</strong> level",
         statProbPoints: "Condition Score",
         statProbLevel: "LoF Likelihood",
         statConsFinal: "CoF Exposure",
@@ -746,7 +748,9 @@ const uiTranslations = {
         uploadZoneTitle: "Load Database (.xlsx)",
         uploadZoneSubtitle: "Drag or click here",
         lblFooterSub: "SIM-Q RELIARISK v1.0",
-        lblSelectPlatform: "Select Platform to Simulate:"
+        lblSelectPlatform: "Select Platform to Simulate:",
+        btnSaveAnalysis: "💾 Save Analysis (.json)",
+        btnDownloadAnalysis: "⬇️ Download (.json)"
     }
 };// Descripciones personalizadas por plataforma
 const platformDescriptions = {
@@ -762,11 +766,11 @@ const platformDescriptions = {
     },
     'Balam-A': {
         es: "Octópodo de Perforación y Recolección. Aloja la Planta Principal de Tratamiento e Inyección de Agua de Mar.",
-        en: "Drilling and Gathering Octopod. Houses the Main Seawater Treatment and Injection Plant."
+        en: "Drilling and Gathering 8-Legged Platform. Houses the Main Seawater Treatment and Injection Plant."
     },
     'EK-TB': {
         es: "Trípode adosado de perforación y producción. Aloja el circuito cerrado de agua congénita.",
-        en: "Attached drilling and production tripod. Houses the closed-loop produced water circuit."
+        en: "Attached drilling and production Tripod Platform. Houses the closed-loop produced water circuit."
     }
 };
 
@@ -786,6 +790,51 @@ const platformMetadata = {
     'Balam-A': { age: 12, occupancy: 'L-2', occupancyVal: 0, bpd: 8000 },
     'EK-TB': { age: 33, occupancy: 'L-2', occupancyVal: 0, bpd: 3000 }
 };
+
+// Traducir niveles de criticidad (Baja/Media/Alta) dinámicamente
+function translateLevel(level, forceCase = 'none') {
+    if (!level) return '';
+    const upper = level.toString().toUpperCase().trim();
+    let result = level;
+    if (upper === 'BAJA') {
+        result = currentLang === 'en' ? 'Low' : 'Baja';
+    } else if (upper === 'MEDIA') {
+        result = currentLang === 'en' ? 'Medium' : 'Media';
+    } else if (upper === 'ALTA') {
+        result = currentLang === 'en' ? 'High' : 'Alta';
+    }
+    
+    if (forceCase === 'upper') return result.toUpperCase();
+    if (forceCase === 'lower') return result.toLowerCase();
+    if (forceCase === 'title') return result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+    return result;
+}
+
+// Traducir coordenadas de matriz (ej. ALTA-L-2 a HIGH-L-2) dinámicamente
+function translateCoordinate(coord) {
+    if (!coord) return '';
+    const parts = coord.split('-');
+    if (parts.length >= 2) {
+        const lofPart = parts[0];
+        const rest = parts.slice(1).join('-');
+        return `${translateLevel(lofPart, 'upper')}-${rest}`;
+    }
+    return coord;
+}
+
+// Traducir tipos de estructura (Octápodo, Trípode, Tetrápodo, Monopilote) dinámicamente
+function translateStructureType(tipo) {
+    if (!tipo) return '';
+    const upper = tipo.toUpperCase().trim();
+    if (currentLang === 'en') {
+        if (upper.includes('OCTÁPODO') || upper.includes('OCTAPODO')) return tipo.toUpperCase().includes('ACERO') ? 'Steel 8-Legged Platform' : '8-Legged Platform';
+        if (upper.includes('TETRÁPODO') || upper.includes('TETRAPODO')) return tipo.toUpperCase().includes('ACERO') ? 'Steel 4-Legged Platform' : '4-Legged Platform';
+        if (upper.includes('TRÍPODE ADOSADO') || upper.includes('TRIPODE ADOSADO')) return 'Attached Tripod Platform';
+        if (upper.includes('TRÍPODE') || upper.includes('TRIPODE')) return 'Tripod Platform';
+        if (upper.includes('MONOPILOTE')) return 'Monopile Platform';
+    }
+    return tipo;
+}
 
 // Obtener metadatos con fallbacks seguros
 function getPlatformMeta(platName) {
@@ -973,6 +1022,12 @@ function translateStaticUI() {
     
     const elLoadJsonBtn = document.getElementById('lblLoadJsonBtn');
     if (elLoadJsonBtn) elLoadJsonBtn.innerText = t.lblLoadJsonBtn;
+    
+    const elSaveAnalysis = document.getElementById('btnSaveAnalysis');
+    if (elSaveAnalysis) elSaveAnalysis.innerHTML = t.btnSaveAnalysis;
+    
+    const elDownloadAnalysis = document.getElementById('btnDownloadAnalysis');
+    if (elDownloadAnalysis) elDownloadAnalysis.innerHTML = t.btnDownloadAnalysis;
     
     const elExcelOps = document.getElementById('lblExcelOps');
     if (elExcelOps) elExcelOps.innerText = t.lblExcelOps;
@@ -1212,12 +1267,13 @@ function switchTab(tabId) {
         // Agregar metadatos de plataforma al encabezado
         const meta = getPlatformMeta(platName);
         const answers = platformsData[platName] || {};
-        const structureType = (answers && answers['TIPO']) ? answers['TIPO'] 
-                            : (platName.includes('Hab') ? (isES ? 'Tetrápodo de Acero' : 'Steel Tetrapod') 
-                            : (platName.includes('TA') && !platName.includes('Balam') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                            : (platName.includes('TB') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                            : (platName.includes('TC') ? (isES ? 'Trípode' : 'Tripod')
-                            : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : (isES ? 'Octápodo de Acero' : 'Steel Octapod'))))));
+        const structureTypeRaw = (answers && answers['TIPO']) ? answers['TIPO'] 
+                            : (platName.includes('Hab') ? 'Tetrápodo de Acero'
+                            : (platName.includes('TA') && !platName.includes('Balam') ? 'Trípode Adosado'
+                            : (platName.includes('TB') ? 'Trípode Adosado'
+                            : (platName.includes('TC') ? 'Trípode'
+                            : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : 'Octápodo de Acero')))));
+        const structureType = isES ? structureTypeRaw : translateStructureType(structureTypeRaw);
         const waterDepth = (answers && answers['TIRANTE']) 
                             ? (String(answers['TIRANTE']).endsWith('m') ? answers['TIRANTE'] : `${answers['TIRANTE']}m`)
                             : (platName.includes('TA') ? '51.5m' : (platName.includes('TB') ? '51.5m' : (platName.includes('A') ? '50.0m' : '52.0m')));
@@ -1532,8 +1588,8 @@ function renderDashboard() {
                 <div class="plat-desc-sub">${platformDescriptions[plat.name] ? platformDescriptions[plat.name][currentLang] : t.platDescDefault}</div>
             </td>
             <td>${m.finalCons}</td>
-            <td>${m.probLevel}</td>
-            <td><span class="matrix-coord">${m.coordinate}</span></td>
+            <td>${translateLevel(m.probLevel, 'upper')}</td>
+            <td><span class="matrix-coord">${translateCoordinate(m.coordinate)}</span></td>
             <td><span class="badge-risk ${riskClassClean}">${riskNameClean}${triggerMarker}</span></td>
             <td><button class="action-btn" onclick="switchTab('platform:${plat.name}')">${t.btnInspect}</button></td>
         `;
@@ -1566,7 +1622,7 @@ function renderGlobalMatrix(platforms) {
     </div>`;
     
     lofOrder.forEach(l => {
-        grid.innerHTML += `<div class="matrix-cell-global header-cell">${l}</div>`;
+        grid.innerHTML += `<div class="matrix-cell-global header-cell">${translateLevel(l, 'upper')}</div>`;
     });
 
     cofOrder.forEach(c => {
@@ -1651,6 +1707,7 @@ function renderPlatform(platName) {
     clone.querySelector('.matrix-container h2').innerText = t.platTitleMatrix;
     clone.querySelector('.summary-container h2').innerText = t.platTitleStats;
     clone.querySelector('.mitigation-panel h2').innerText = t.platTitleMitigation;
+    clone.querySelector('.mitigation-panel .panel-subtitle').innerHTML = t.platSubtitleMitigation;
     clone.querySelector('#inspectionCardTitle').innerText = t.inspectionTitle;
 
     clone.querySelector('.platform-charts-panel h2').innerText = t.platformChartsTitle;
@@ -1779,7 +1836,7 @@ function updatePlatformSimulation() {
     riskBadge.className = `risk-badge-large ${simMetrics.riskClass}`;
     
     const coordBadge = document.getElementById('platformCoordBadge');
-    coordBadge.innerText = simMetrics.coordinate;
+    coordBadge.innerText = translateCoordinate(simMetrics.coordinate);
 
     const triggerBadge = document.getElementById('triggerWarningBadge');
     if (simMetrics.triggerEscalation) {
@@ -1790,7 +1847,7 @@ function updatePlatformSimulation() {
     }
 
     // Actualizar caja de estadísticas
-    document.getElementById('probLevel').innerText = simMetrics.probLevel;
+    document.getElementById('probLevel').innerText = translateLevel(simMetrics.probLevel, 'title');
     document.getElementById('consFinal').innerText = simMetrics.finalCons;
     document.getElementById('riskLevelVal').innerText = simMetrics.riskName;
 
@@ -1827,7 +1884,7 @@ function renderPlatformMatrix(originalCoord, simulatedCoord) {
     </div>`;
 
     lofOrder.forEach(l => {
-        grid.innerHTML += `<div class="matrix-cell header-cell">${l}</div>`;
+        grid.innerHTML += `<div class="matrix-cell header-cell">${translateLevel(l, 'upper')}</div>`;
     });
 
     cofOrder.forEach(c => {
@@ -1923,7 +1980,7 @@ function renderMitigationPlan(platName, originalAnswers, mitigations, sim) {
             banner.innerHTML = t.successOptimal;
         } else {
             banner.className = "mitigation-status-banner success";
-            banner.innerHTML = t.successGoal.replace('{coord}', sim.coordinate);
+            banner.innerHTML = t.successGoal.replace('{coord}', translateCoordinate(sim.coordinate));
         }
     } else {
         banner.className = "mitigation-status-banner warning";
@@ -1939,7 +1996,7 @@ function renderMitigationPlan(platName, originalAnswers, mitigations, sim) {
 
         banner.innerHTML = t.bannerWarning
             .replace('{riskName}', sim.riskName)
-            .replace('{coord}', sim.coordinate)
+            .replace('{coord}', translateCoordinate(sim.coordinate))
             .replace('{reqText}', reqText);
     }
 
@@ -2526,7 +2583,7 @@ function drawBubbleChart(containerId) {
         const tooltipContent = `
             <div class="tooltip-title">${p.name} ${p.name === 'Balam-TC' ? (currentLang === 'es' ? '(Inactiva)' : '(Inactive)') : ''}</div>
             <div class="tooltip-row"><span class="tooltip-label">${t.tooltipAge}:</span><span class="tooltip-value">${p.age} ${currentLang === 'es' ? 'años' : 'years'}</span></div>
-            <div class="tooltip-row"><span class="tooltip-label">${t.tooltipLoF}:</span><span class="tooltip-value">${p.lofPoints}</span></div>
+            <div class="tooltip-row"><span class="tooltip-label">${t.tooltipLoF}:</span><span class="tooltip-value">${translateLevel(p.lofPoints, 'title')}</span></div>
             <div class="tooltip-row"><span class="tooltip-label">${t.tooltipCoF}:</span><span class="tooltip-value">${p.cof}</span></div>
             <div class="tooltip-row"><span class="tooltip-label">${t.tooltipRisk}:</span><span class="tooltip-value" style="color:${strokeColor}">${p.name === 'Balam-TC' ? (currentLang === 'es' ? 'Inactiva' : 'Inactive') : p.riskName}</span></div>
             <div class="tooltip-row"><span class="tooltip-label">${t.tooltipStaff}:</span><span class="tooltip-value">${p.occupancyVal} pax (${p.occupancy})</span></div>
@@ -3149,8 +3206,8 @@ function exportFleetReport() {
             <tr>
                 <td class="bold">${p.name}${inactiveText}</td>
                 <td class="text-center">${m.finalCons}</td>
-                <td class="text-center">${m.probLevel}</td>
-                <td class="text-center">${m.coordinate}</td>
+                <td class="text-center">${translateLevel(m.probLevel, 'title')}</td>
+                <td class="text-center">${translateCoordinate(m.coordinate)}</td>
                 <td class="text-center risk-cell-${m.riskCode}">${m.riskName}</td>
                 <td class="text-center" ${triggerStyle}>${triggerText}</td>
             </tr>
@@ -3175,12 +3232,13 @@ function exportFleetReport() {
         const desc = platformDescriptions[platName] ? platformDescriptions[platName][isES ? 'es' : 'en'] : (isES ? 'Plataforma Satélite de Extracción' : 'Satellite Extraction Platform');
         const intervals = getInspectionIntervals(m.riskCode);
         
-        const structureType = (answers && answers['TIPO']) ? answers['TIPO'] 
-                            : (platName.includes('Hab') ? (isES ? 'Tetrápodo de Acero' : 'Steel Tetrapod') 
-                            : (platName.includes('TA') && !platName.includes('Balam') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                            : (platName.includes('TB') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                            : (platName.includes('TC') ? (isES ? 'Trípode' : 'Tripod')
-                            : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : (isES ? 'Octápodo de Acero' : 'Steel Octapod'))))));
+        const structureTypeRaw = (answers && answers['TIPO']) ? answers['TIPO'] 
+                            : (platName.includes('Hab') ? 'Tetrápodo de Acero'
+                            : (platName.includes('TA') && !platName.includes('Balam') ? 'Trípode Adosado'
+                            : (platName.includes('TB') ? 'Trípode Adosado'
+                            : (platName.includes('TC') ? 'Trípode'
+                            : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : 'Octápodo de Acero')))));
+        const structureType = isES ? structureTypeRaw : translateStructureType(structureTypeRaw);
         const waterDepth = (answers && answers['TIRANTE']) 
                             ? (String(answers['TIRANTE']).endsWith('m') ? answers['TIRANTE'] : `${answers['TIRANTE']}m`)
                             : (platName.includes('TA') ? '51.5m' : (platName.includes('TB') ? '51.5m' : (platName.includes('A') ? '50.0m' : '52.0m')));
@@ -3246,9 +3304,9 @@ function exportFleetReport() {
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="text-center bold">${m.probLevel}</td>
+                        <td class="text-center bold">${translateLevel(m.probLevel, 'title')}</td>
                         <td class="text-center bold">${m.finalCons}</td>
-                        <td class="text-center bold">${m.coordinate}</td>
+                        <td class="text-center bold">${translateCoordinate(m.coordinate)}</td>
                         <td class="text-center risk-cell-${m.riskCode}">${m.riskName}</td>
                     </tr>
                 </tbody>
@@ -3377,12 +3435,13 @@ function exportPlatformReportActive() {
     const desc = platformDescriptions[platName] ? platformDescriptions[platName][isES ? 'es' : 'en'] : (isES ? 'Plataforma Satélite de Extracción' : 'Satellite Extraction Platform');
     const intervals = getInspectionIntervals(m.riskCode);
     
-    const structureType = (answers && answers['TIPO']) ? answers['TIPO'] 
-                        : (platName.includes('Hab') ? (isES ? 'Tetrápodo de Acero' : 'Steel Tetrapod') 
-                        : (platName.includes('TA') && !platName.includes('Balam') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                        : (platName.includes('TB') ? (isES ? 'Trípode Adosado' : 'Attached Tripod')
-                        : (platName.includes('TC') ? (isES ? 'Trípode' : 'Tripod')
-                        : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : (isES ? 'Octápodo de Acero' : 'Steel Octapod'))))));
+    const structureTypeRaw = (answers && answers['TIPO']) ? answers['TIPO'] 
+                        : (platName.includes('Hab') ? 'Tetrápodo de Acero'
+                        : (platName.includes('TA') && !platName.includes('Balam') ? 'Trípode Adosado'
+                        : (platName.includes('TB') ? 'Trípode Adosado'
+                        : (platName.includes('TC') ? 'Trípode'
+                        : (platName.includes('1') ? (isES ? 'Estructura Marina Ligera' : 'Light Sea Horse Structure') : 'Octápodo de Acero')))));
+    const structureType = isES ? structureTypeRaw : translateStructureType(structureTypeRaw);
     const waterDepth = (answers && answers['TIRANTE']) 
                         ? (String(answers['TIRANTE']).endsWith('m') ? answers['TIRANTE'] : `${answers['TIRANTE']}m`)
                         : (platName.includes('TA') ? '51.5m' : (platName.includes('TB') ? '51.5m' : (platName.includes('A') ? '50.0m' : '52.0m')));
@@ -3551,9 +3610,9 @@ function exportPlatformReportActive() {
             </thead>
             <tbody>
                 <tr>
-                    <td class="text-center bold">${m.probLevel}</td>
+                    <td class="text-center bold">${translateLevel(m.probLevel, 'title')}</td>
                     <td class="text-center bold">${m.finalCons}</td>
-                    <td class="text-center bold">${m.coordinate}</td>
+                    <td class="text-center bold">${translateCoordinate(m.coordinate)}</td>
                     <td class="text-center risk-cell-${m.riskCode}">${m.riskName}</td>
                 </tr>
             </tbody>
