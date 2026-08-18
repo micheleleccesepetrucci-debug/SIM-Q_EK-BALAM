@@ -127,7 +127,7 @@ def get_base64_image(image_path):
 
 # Compilar aplicación HTML/JS/CSS en un archivo único autocontenido para el iframe
 @st.cache_data
-def compile_interactive_app():
+def compile_interactive_app_v2():
     html_path = "app/index.html"
     css_path = "app/style.css"
     js_path = "app/app.js"
@@ -180,7 +180,7 @@ tab_simulator, tab_report, tab_docs = st.tabs([
 
 # --- PESTAÑA 1: SIMULADOR INTERACTIVO ---
 with tab_simulator:
-    html_compiled = compile_interactive_app()
+    html_compiled = compile_interactive_app_v2()
     
     if html_compiled is None:
         st.error("Error al compilar los archivos de la aplicación interactiva. Asegúrate de que la carpeta 'app/' con index.html, style.css y app.js exista.")
