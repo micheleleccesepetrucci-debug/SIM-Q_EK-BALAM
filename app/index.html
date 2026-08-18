@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Integridad Estructural - Complejo Ek-Balam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Carga de SheetJS para lectura de Excel en cliente -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<body>
+    <!-- Centered Login Screen (hidden by default) -->
+    <div class="login-container" id="loginContainer" style="display: none;">
+        <div class="login-card">
+            <div class="login-card-header">
+                <div class="login-emoji">🛡️</div>
+                <h2 id="loginTitle">Reliarisk SIM-Q</h2>
+                <p id="loginSubtitle">Sistema de Gestión de Integridad Estructural (API RP 2SIM)</p>
+            </div>
+            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                <p class="login-form-prompt" id="loginPrompt">Ingrese sus credenciales de acceso para continuar:</p>
+                <div class="form-group">
+                    <label for="usernameInput" id="lblUser">Usuario / Client ID</label>
+                    <input type="text" id="usernameInput" placeholder="Ej. cliente_ekbalam1 o admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="passwordInput" id="lblPass">Contraseña / Password</label>
+                    <input type="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-login" id="btnLogin">🔐 Iniciar Sesión</button>
+                <div class="login-error-msg" id="loginErrorMsg" style="display: none;"></div>
+            </form>
+            <div class="login-footer">
+                Plataforma Segura Grupo Reliarisk Software &copy; 2026<br>
+                <i>API RP 2SIM Structural Integrity Management Module</i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Layout (hidden by default) -->
+    <div class="app-layout" id="appLayout" style="display: none;">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <!-- Sidebar Logos -->
+            <div class="sidebar-logos">
+                <img src="Mi_Logo.jpeg" alt="Company Logo" class="sidebar-logo">
+                <img src="Logo_App.jpg" alt="App Logo" class="sidebar-logo">
+            </div>
+
+            <!-- App branding -->
+            <div class="sidebar-branding">
+                <div class="sidebar-title">SIM-Q Reliarisk</div>
+                <div class="sidebar-subtitle" id="lblSidebarSub">Sistema de Integridad de Estructuras Civiles</div>
+            </div>
+
+            <!-- Active User Badge -->
+            <div class="user-badge" id="sidebarUserBadge">
+                <div class="user-badge-header" id="lblActiveUser">USUARIO ACTIVO</div>
+                <div class="user-badge-name" id="userFullName">-</div>
+                <div class="user-badge-role" id="userRole">-</div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-btn active" id="nav-dashboard" onclick="switchTab('dashboard')">
+                    📊 Jerarquización General
+                </button>
+                <button class="sidebar-nav-btn" id="nav-simulator" onclick="switchTab('simulator')">
+                    🎛️ Simulador por Plataforma
+                </button>
+                <button class="sidebar-nav-btn" id="nav-admin" onclick="switchTab('admin')" style="display: none;">
+                    👥 Gestión Usuarios
+                </button>
+                <button class="sidebar-nav-btn logout-btn" onclick="handleLogout()">
+                    🚪 Cerrar Sesión
+                </button>
+            </nav>
+
+            <hr class="sidebar-divider">
+
+            <!-- Save/Load Analysis (STORM style) -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" id="lblAnalysisMgmt">Gestión de Análisis</div>
+                <button class="sidebar-action-btn" onclick="saveAnalysisJson()">
+                    💾 Guardar Análisis (.json)
+                </button>
+                <button class="sidebar-action-btn" onclick="downloadAnalysisJson()">
+                    ⬇️ Descargar (.json)
+                </button>
+                <div class="sidebar-file-section">
+                    <div class="sidebar-file-uploader" onclick="triggerJsonUpload()">
+                        <span id="lblLoadJsonBtn">Cargar Archivo (.json)</span>
+                        <input type="file" id="jsonFileUploader" accept=".json" style="display: none;" onchange="loadAnalysisJson(event)">
+                    </div>
+                    <div id="jsonLoadStatus" class="load-status-msg"></div>
+                </div>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <!-- Excel Operations -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" id="lblExcelOps">Operaciones de Excel</div>
+                <div class="sidebar-file-section">
+                    <div class="excel-upload-zone-sidebar" id="uploadZoneSidebar">
+                        <div class="upload-icon-sidebar">📊</div>
+                        <div class="upload-text-sidebar">
+                            <strong id="uploadZoneTitle">Cargar Base de Datos (.xlsx)</strong>
+                            <span id="uploadZoneSubtitle">Arrastra o haz clic aquí</span>
+                        </div>
+                        <input type="file" id="excelFileSidebar" accept=".xlsx, .xls" style="display: none;">
+                    </div>
+                    <div id="excelLoadStatus" class="load-status-msg"></div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <span id="lblFooterSub">SIM-Q RELIARISK v1.0</span>
+            </div>
+        </aside>
+
+        <!-- Right Main Content Area -->
+        <main class="main-content-wrapper">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="page-header-content">
+                    <div class="header-path">
+                        <span class="path-app">SIM-Q RELIARISK</span>
+                        <span class="path-separator">/</span>
+                        <span class="path-current" id="headerCurrentPage">Jerarquización General</span>
+                    </div>
+                    <div class="header-metadata" id="headerMetadataArea">
+                        <div class="metadata-item">
+                            <span class="metadata-label" id="lblHeaderInst">Área Contractual:</span>
+                            <span class="metadata-val">Complejo Ek-Balam (CNH-M1-EK-BALAM/2017)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-controls-right">
+                    <!-- Export Fleet Button -->
+                    <button id="btnExportFleet" class="export-btn" onclick="exportFleetReport()">📄 Descargar Reporte Word</button>
+                    <!-- Language selector -->
+                    <div class="lang-selector-header">
+                        <select id="langSelector" onchange="setLanguage(this.value)">
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="en">🇺🇸 English</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Container -->
+            <div class="main-content" id="mainContent">
+                <!-- Active view content will be injected here via JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Templates definitions for dynamic rendering -->
+    <template id="dashboard-template">
+        <div class="dashboard-grid">
+            <!-- KPI Summary Cards -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-val" id="kpiTotal">0</div>
+                    <div class="kpi-lbl">Total Plataformas</div>
+                </div>
+
+                <div class="kpi-card risk-high-card">
+                    <div class="kpi-val" id="kpiHigh">0</div>
+                    <div class="kpi-lbl">Alto Riesgo</div>
+                </div>
+                <div class="kpi-card risk-medium-card">
+                    <div class="kpi-val" id="kpiMedium">0</div>
+                    <div class="kpi-lbl">Medio Riesgo</div>
+                </div>
+                <div class="kpi-card risk-low-card">
+                    <div class="kpi-val" id="kpiLow">0</div>
+                    <div class="kpi-lbl">Bajo Riesgo</div>
+                </div>
+            </div>
+
+            <!-- Consolidated 3x5 Matrix & Ranked Table -->
+            <div class="dashboard-panels">
+                <div class="matrix-panel glass-panel">
+                    <h2>Matriz de Criticidad Consolidada (3x3)</h2>
+                    <p class="panel-subtitle">Posición relativa de todas las instalaciones evaluadas (API RP 2SIM)</p>
+                    <div class="matrix-grid-global" id="matrixGridGlobal">
+                        <!-- Plotted matrix cells with platform badges -->
+                    </div>
+                </div>
+
+                <div class="table-panel glass-panel">
+                    <h2>Jerarquización de Plataformas por Criticidad</h2>
+                    <p class="panel-subtitle">Listado priorizado de mayor a menor riesgo estructural</p>
+                    <div class="table-wrapper">
+                        <table class="hierarchy-table">
+                            <thead>
+                                <tr>
+                                    <th>Plataforma</th>
+                                    <th>Exposición (CoF)</th>
+                                    <th>Probabilidad (LoF)</th>
+                                    <th>Coordenada</th>
+                                    <th>Riesgo</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hierarchyTableBody">
+                                <!-- Table rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fleet Analytics Section -->
+            <div class="fleet-analytics-panel glass-panel">
+                <div class="analytics-header">
+                    <h2 id="lblAnalyticsTitle">Análisis e Indicadores de Flota</h2>
+                    <p class="panel-subtitle" id="lblAnalyticsSubtitle">Visualizaciones estratégicas integradas (API RP 2SIM)</p>
+                </div>
+                <div class="analytics-tabs-row">
+                    <div class="analytics-tabs">
+                        <button class="analytics-tab-btn active" id="btn-tab-bubble" onclick="switchAnalyticsTab('bubble')">🫧 Cuadrante de Decisión (Burbujas)</button>
+                        <button class="analytics-tab-btn" id="btn-tab-pareto" onclick="switchAnalyticsTab('pareto')">📊 Pareto de Desviaciones</button>
+                        <button class="analytics-tab-btn" id="btn-tab-sankey" onclick="switchAnalyticsTab('sankey')">🔀 Flujo de Inspección (Sankey)</button>
+                    </div>
+                </div>
+                <div class="analytics-charts-content">
+                    <div class="chart-wrapper-box" id="bubble-chart-box">
+                        <!-- Will hold bubble chart -->
+                    </div>
+                    <div class="chart-wrapper-box" id="pareto-chart-box" style="display: none;">
+                        <!-- Will hold pareto chart -->
+                    </div>
+                    <div class="chart-wrapper-box" id="sankey-chart-box" style="display: none;">
+                        <!-- Will hold sankey chart -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="platform-template">
+        <div class="platform-layout">
+            <div class="platform-header-row">
+                <div class="platform-title-box">
+                    <h2 id="platformNameHeader" class="platform-title">Plataforma</h2>
+                    <p class="platform-desc" id="platformDescriptionText">Evaluación estructural individual</p>
+                    <button id="btnExportPlatform" class="export-btn-sm" style="margin-top: 8px;" onclick="exportPlatformReportActive()">📄 Descargar Reporte Simulación</button>
+                </div>
+                <div class="current-risk-badge-box">
+                    <!-- Mandatory Escalation Trigger Badge -->
+                    <div class="trigger-warning-badge" id="triggerWarningBadge" style="display: none;">
+                        ⚠️ ESCALAMIENTO N2-N3 OBLIGATORIO
+                    </div>
+                    <span class="risk-badge-large" id="platformRiskBadge">Cargando...</span>
+                    <span class="coordinate-badge" id="platformCoordBadge">1-1</span>
+                </div>
+            </div>
+
+            <div class="platform-body-grid">
+                <!-- Column 1: Questionnaire (interactive simulator) -->
+                <section class="form-section glass-panel">
+                    <h2>Cuestionario y Parámetros (Módulos A, B, C, D)</h2>
+                    <p class="panel-subtitle">Modifica las respuestas para simular un análisis de riesgos</p>
+
+                    <div class="question-list" id="questionList">
+                        <!-- Questions injected via JS -->
+                    </div>
+                </section>
+
+                <!-- Column 2: Results & Mitigation Report -->
+                <section class="results-section">
+                    <!-- Matrix highlighted for this platform (3x5) -->
+                    <div class="matrix-container glass-panel">
+                        <h2>Matriz de Criticidad de la Plataforma (3x3)</h2>
+                        <div class="matrix-grid" id="matrixGrid">
+                            <!-- Injected matrix grid -->
+                        </div>
+                    </div>
+
+                    <!-- Statistics box -->
+                    <div class="summary-container glass-panel">
+                        <h2>Resultados de Simulación</h2>
+                        <div class="summary-stats">
+                            <div class="stat-box">
+                                <span class="stat-label" id="lblStatLoF">Probabilidad (LoF)</span>
+                                <span class="stat-value" id="probLevel">BAJA</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label" id="lblStatCoF">Exposición (CoF)</span>
+                                <span class="stat-value" id="consFinal">L-3</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label" id="lblStatRisk">Nivel de Riesgo</span>
+                                <span class="stat-value" id="riskLevelVal">Nivel 3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Analysis Charts -->
+                    <div class="platform-charts-panel glass-panel">
+                        <h2>Análisis Gráfico de Integridad</h2>
+                        <p class="panel-subtitle">Causas de riesgo y perfil de salud estructural (API RP 2SIM)</p>
+                        <div class="platform-charts-grid">
+                            <div class="platform-chart-box">
+                                <h3 class="chart-box-title" id="lblRadarChart">Perfil de Salud (Radar)</h3>
+                                <div class="svg-chart-wrapper" id="radar-chart-container">
+                                    <!-- Radar Chart SVG will be injected here -->
+                                </div>
+                            </div>
+                            <div class="platform-chart-box">
+                                <h3 class="chart-box-title" id="lblWaterfallChart">Descomposición de Riesgo (Cascada)</h3>
+                                <div class="svg-chart-wrapper" id="waterfall-chart-container">
+                                    <!-- Waterfall Chart SVG will be injected here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Mitigation Plan Card -->
+                    <div class="mitigation-panel glass-panel" id="mitigationPanel">
+                        <h2>Plan de Mitigación Recomendado</h2>
+                        <p class="panel-subtitle">Acciones requeridas para llevar la plataforma a un nivel de <strong>Riesgo Bajo (L)</strong></p>
+                        
+                        <div class="mitigation-status-banner" id="mitigationStatusBanner">
+                            <!-- Success or Warning banner -->
+                        </div>
+
+                        <!-- Inspection recommendations according to API 2SIM -->
+                        <div class="inspection-recommendation-card" id="inspectionRecommendationCard" style="display: none;">
+                            <h3 id="inspectionCardTitle">Intervalos de Inspección Recomendados (API RP 2SIM)</h3>
+                            <div class="inspection-intervals">
+                                <div class="interval-item"><strong class="interval-lbl">GVI:</strong> <span id="gviInterval">-</span></div>
+                                <div class="interval-item"><strong class="interval-lbl">CVI:</strong> <span id="cviInterval">-</span></div>
+                                <div class="interval-item"><strong class="interval-lbl">NDT:</strong> <span id="ndtInterval">-</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mitigation-actions-list" id="mitigationActionsList">
+                            <!-- Injected checklists and actions -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </template>
+
+    <!-- General Floating Tooltip -->
+    <div id="chart-tooltip" class="chart-tooltip" style="opacity: 0; pointer-events: none;"></div>
+
+    <script src="app.js?v=14"></script>
+</body>
+</html>

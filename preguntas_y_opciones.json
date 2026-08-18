@@ -1,0 +1,136 @@
+{
+    "metodologia_api_rp_2sim_3x3": [
+        {
+            "id": "A1",
+            "modulo": "A",
+            "nombre_modulo": "Módulo A: Categoría de Seguridad Humana / Ocupación",
+            "tipo": "Consecuencia (S-Category)",
+            "pregunta": "Régimen de Ocupación: ¿Cuál es el régimen habitual de ocupación de personal en la plataforma?",
+            "opcion_a": "Habitada continuamente / Habitacional permanente",
+            "opcion_b": "Habitada operativamente / De trabajo (evacuación planificada)",
+            "opcion_c": "No habitada (Unmanned) / Ocasional",
+            "mitigacion": "Automatizar las operaciones para operar de forma no tripulada (unmanned) y reducir la dotación."
+        },
+        {
+            "id": "A2",
+            "modulo": "A",
+            "nombre_modulo": "Módulo A: Categoría de Seguridad Humana / Ocupación",
+            "tipo": "Consecuencia (S-Category)",
+            "pregunta": "Plan de Evacuación: ¿Se cuenta con un plan de evacuación probado, tiempo suficiente y recursos aéreos/marítimos en huracán/Norte?",
+            "opcion_a": "Sí: Plan formal y recursos logísticos plenamente garantizados (Clasifica como S-2)",
+            "opcion_b": "No: Evacuación pre-evento no garantizada o impracticable (Clasifica como S-1)",
+            "opcion_c": "No aplica: Plataforma no habitada (Clasifica como S-3)",
+            "mitigacion": "Desarrollar y certificar un protocolo formal de evacuación pre-tormenta con logística de PEMEX."
+        },
+        {
+            "id": "B1",
+            "modulo": "B",
+            "nombre_modulo": "Módulo B: Consecuencias de Falla",
+            "tipo": "Consecuencia (C-Category)",
+            "pregunta": "Riesgo por Fluido y Gas Amargo H2S: ¿Maneja o está conectada a pozos con flujo autógeno de H2S o aceite?",
+            "opcion_a": "Sí, y el cierre automático no está garantizado o es un nodo troncal mayor (Clasifica como C-1)",
+            "opcion_b": "Sí, pero cuenta con Válvulas de Seguridad Subsuperficiales (SSSV) operativas e inspeccionadas (Clasifica como C-2)",
+            "opcion_c": "No: No maneja hidrocarburos o pozos con bombeo mecánico/neumático sin flujo autógeno (Clasifica como C-3)",
+            "mitigacion": "Instalar o programar pruebas preventivas de las válvulas SSSV e instrumentación de aislamiento rápido."
+        },
+        {
+            "id": "B2",
+            "modulo": "B",
+            "nombre_modulo": "Módulo B: Consecuencias de Falla",
+            "tipo": "Consecuencia (C-Category)",
+            "pregunta": "Rol de Infraestructura: ¿Cuál es el rol operativo y de infraestructura en la red de la Sonda de Campeche?",
+            "opcion_a": "Infraestructura Crítica / Complejo Troncal: Exportación, compresión mayor o almacenamiento (Clasifica como C-1)",
+            "opcion_b": "Plataforma Intermedia / Producción Estándar: Proceso/perforación aislable pre-evento (Clasifica como C-2)",
+            "opcion_c": "Plataforma Mínima / Satélite: Estructura pequeña, ≤5 pozos, tirante ≤30m, cubierta ≤37m² (Clasifica como C-3)",
+            "mitigacion": "Implementar loops de desvío o interconexiones que permitan aislar la plataforma sin paralizar la flota."
+        },
+        {
+            "id": "C1",
+            "modulo": "C",
+            "nombre_modulo": "Módulo C: Probabilidad de Falla / Condición Estructural",
+            "tipo": "Probabilidad (LoF)",
+            "pregunta": "Luz Libre / Air Gap: ¿Cuál es la elevación de la cubierta Cellar Deck respecto a la cresta de ola metoceánica extrema?",
+            "opcion_a": "Inadecuada / Impacto de ola en cubierta (Wave-in-deck) (Dispara Probabilidad ALTA)",
+            "opcion_b": "Luz libre (Air Gap) Marginal: Margen menor a 1 metro",
+            "opcion_c": "Luz libre (Air Gap) Adecuada: Cumple con la elevación de seguridad sin riesgo de inundación",
+            "mitigacion": "Aligerar cubiertas inferiores, remover obstrucciones o realizar análisis hidrodinámico de ola en cubierta."
+        },
+        {
+            "id": "C2",
+            "modulo": "C",
+            "nombre_modulo": "Módulo C: Probabilidad de Falla / Condición Estructural",
+            "tipo": "Probabilidad (LoF)",
+            "pregunta": "Redundancia Jacket: ¿Qué tipo de configuración geométrica de arriostramiento (Bracing) posee la subestructura?",
+            "opcion_a": "Baja Redundancia / Crítica: Caisson, Trípode, o 4 piernas con arriostramiento K/diagonal sin caminos alternos",
+            "opcion_b": "Redundancia Moderada: Estructura de 4 o 6 piernas con arriostramiento diagonal combinado",
+            "opcion_c": "Alta Redundancia / Robusta: Estructura de 8 piernas o más con arriostramiento tipo X (X-braced)",
+            "mitigacion": "Realizar estudios estructurales de capacidad remanente e instalar abrazaderas de refuerzo en nudos críticos."
+        },
+        {
+            "id": "C3",
+            "modulo": "C",
+            "nombre_modulo": "Módulo C: Probabilidad de Falla / Condición Estructural",
+            "tipo": "Probabilidad (LoF)",
+            "pregunta": "Daño Físico o Degradación: ¿Cuál es el estado de daño mecánico, grietas por fatiga o corrosión de la estructura?",
+            "opcion_a": "Daño Severo / Reducción >10% capacidad: Miembros rotos/faltantes, grietas críticas o corrosión severa (ALTA)",
+            "opcion_b": "Daño Moderado: Corrosión splash zone localizada, abolladuras menores o pérdida parcial de ánodos",
+            "opcion_c": "Sin Daños Significativos: Estructura en buen estado general, protección catódica conforme (≤-800mV)",
+            "mitigacion": "Ejecutar reparaciones submarinas (soldadura, amolado de grietas o relleno con lechada) y retrofit de ánodos."
+        },
+        {
+            "id": "D1",
+            "modulo": "D",
+            "nombre_modulo": "Módulo D: Iniciadores de Evaluación Estructural Detallada",
+            "tipo": "Iniciador (Gatillo)",
+            "pregunta": "Iniciador 1 (Personal): ¿Se ha incrementado la dotación de personal o cambiado a una categoría más restrictiva?",
+            "opcion_a": "Sí: Dispara Reevaluación Estructural",
+            "opcion_b": "No: Sin incrementos ni cambios de categoría",
+            "opcion_c": null,
+            "mitigacion": "Reducir la dotación para volver a la categoría de diseño original o realizar estudio de extensión de vida."
+        },
+        {
+            "id": "D2",
+            "modulo": "D",
+            "nombre_modulo": "Módulo D: Iniciadores de Evaluación Estructural Detallada",
+            "tipo": "Iniciador (Gatillo)",
+            "pregunta": "Iniciador 2 (Instalaciones): ¿Se han instalado nuevos módulos, pozos o equipos que aumenten las consecuencias?",
+            "opcion_a": "Sí: Dispara Reevaluación Estructural",
+            "opcion_b": "No: Sin adiciones de equipos mayores",
+            "opcion_c": null,
+            "mitigacion": "Realizar análisis de flexibilidad e interconexión para justificar la exención de reevaluación o retirar equipos inactivos."
+        },
+        {
+            "id": "D3",
+            "modulo": "D",
+            "nombre_modulo": "Módulo D: Iniciadores de Evaluación Estructural Detallada",
+            "tipo": "Iniciador (Gatillo)",
+            "pregunta": "Iniciador 3 (Sobrecarga): ¿Existe un incremento de cargas operativas o ambientales >10% respecto al diseño?",
+            "opcion_a": "Sí: Dispara Reevaluación Estructural",
+            "opcion_b": "No: Cargas operativas y ambientales controladas dentro de límites",
+            "opcion_c": null,
+            "mitigacion": "Desarrollar una campaña de reducción de peso (aligerar topside) e instrumentar la estructura."
+        },
+        {
+            "id": "D4",
+            "modulo": "D",
+            "nombre_modulo": "Módulo D: Iniciadores de Evaluación Estructural Detallada",
+            "tipo": "Iniciador (Gatillo)",
+            "pregunta": "Iniciador 4 (Ola en Cubierta): ¿La cresta de ola extrema alcanza o supera la estructura inferior (Cellar Deck)?",
+            "opcion_a": "Sí: Dispara Reevaluación Estructural de Resistencia Última (Pushover)",
+            "opcion_b": "No: Margen de luz libre conforme",
+            "opcion_c": null,
+            "mitigacion": "Realizar un análisis Pushover Nivel III con fuerzas hidrodinámicas de ola en cubierta y mitigar componentes."
+        },
+        {
+            "id": "D5",
+            "modulo": "D",
+            "nombre_modulo": "Módulo D: Iniciadores de Evaluación Estructural Detallada",
+            "tipo": "Iniciador (Gatillo)",
+            "pregunta": "Iniciador 5 (Daño Acumulado): ¿Existen daños estructurales o deterioro que reduzcan la capacidad global en ≥10%?",
+            "opcion_a": "Sí: Dispara Reevaluación Estructural obligatoria",
+            "opcion_b": "No: Deterioro acumulado por debajo del límite de tolerancia global",
+            "opcion_c": null,
+            "mitigacion": "Reparar los elementos deformados o agrietados inmediatamente para restablecer la capacidad de diseño."
+        }
+    ]
+}
