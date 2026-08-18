@@ -837,10 +837,21 @@ h2 {
 .risk-low-card { border-left: 4px solid var(--risk-low); }
 
 /* Dashboard Layout Panels */
+.glass-panel {
+    background: var(--surface-container-lowest);
+    border-radius: 12px;
+    padding: 20px;
+    outline: 1px solid var(--outline-variant);
+    box-shadow: var(--ambient-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
 .dashboard-panels {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 490px 1fr;
     gap: 24px;
+    align-items: start; /* Evita que la matriz se estire verticalmente para igualar la tabla */
 }
 
 @media (max-width: 1200px) {
@@ -849,20 +860,22 @@ h2 {
     }
 }
 
-/* Consolidated Matrix 3x5 */
+/* Consolidated Matrix 3x3 */
 .matrix-grid-global {
     display: grid;
-    grid-template-columns: 90px repeat(3, 1fr);
-    grid-template-rows: 50px repeat(3, 1fr);
+    grid-template-columns: 80px repeat(3, 120px);
+    grid-template-rows: 40px repeat(3, 120px);
     gap: 6px;
     background: var(--surface-container-low);
     padding: 8px;
     border-radius: 8px;
     outline: 1px solid var(--outline-variant);
+    width: fit-content;
+    margin: 0 auto; /* Centrar la matriz simétrica en su panel */
 }
 
 .matrix-cell-global {
-    min-height: 80px;
+    min-height: auto;
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -933,13 +946,33 @@ h2 {
 .matrix-cell-global.risk-very-high:hover { background: #b21d07; }
 
 /* Badges for platforms in matrix cell */
+.badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.badges-container::-webkit-scrollbar {
+    width: 3px;
+}
+.badges-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
 .platform-badge-link {
     background: var(--surface-container-lowest);
     border: 1px solid var(--outline-variant);
     color: var(--text-main);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    padding: 3px 6px;
+    padding: 2px 4px;
     border-radius: 4px;
     cursor: pointer;
     text-align: center;
