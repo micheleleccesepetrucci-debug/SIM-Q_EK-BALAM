@@ -857,7 +857,7 @@ function getPlatformMeta(platName) {
 
 
 // Estado global de la aplicación
-let currentLang = 'es';
+let currentLang = localStorage.getItem('simq_lang') || 'es';
 let currentTab = 'dashboard';
 let platformsData = {}; // Guarda las respuestas actuales (simuladas)
 let userMitigations = {}; // Guarda los checkboxes de simulación por plataforma: { platName: { qId: true/false } }
@@ -995,15 +995,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // Cambiar de idioma
 function setLanguage(lang) {
     currentLang = lang;
+    try {
+        localStorage.setItem('simq_lang', lang);
+    } catch(e) {}
     
-    // Sincronizar el select del header si existe
+    // Sincronizar select del header
     const langSel = document.getElementById('langSelector');
     if (langSel && langSel.value !== lang) {
         langSel.value = lang;
     }
 
+    // Sincronizar select del login
+    const loginLangSel = document.getElementById('loginLangSelector');
+    if (loginLangSel && loginLangSel.value !== lang) {
+        loginLangSel.value = lang;
+    }
+
     translateStaticUI();
-    switchTab(currentTab);
+    if (currentTab) {
+        switchTab(currentTab);
+    }
 }
 
 // Traducir elementos estáticos de la página
@@ -1095,6 +1106,22 @@ function translateStaticUI() {
     
     const elBtnLogin = document.getElementById('btnLogin');
     if (elBtnLogin) elBtnLogin.innerText = currentLang === 'es' ? '🔐 Iniciar Sesión' : '🔐 Log In';
+
+    const elUserInput = document.getElementById('usernameInput');
+    if (elUserInput) elUserInput.placeholder = currentLang === 'es' ? 'Ej. cliente_ekbalam1 o admin' : 'E.g. cliente_ekbalam1 or admin';
+
+    const elLoginFooter = document.getElementById('loginFooter');
+    if (elLoginFooter) {
+        elLoginFooter.innerHTML = currentLang === 'es' 
+            ? 'Plataforma Segura Grupo Reliarisk Software &copy; 2026<br><i>API RP 2SIM Módulo de Gestión de Integridad Estructural</i>' 
+            : 'Secure Platform Reliarisk Software Group &copy; 2026<br><i>API RP 2SIM Structural Integrity Management Module</i>';
+    }
+
+    // Asegurar sincronización de valores en los selectores
+    const langSel = document.getElementById('langSelector');
+    if (langSel && langSel.value !== currentLang) langSel.value = currentLang;
+    const loginLangSel = document.getElementById('loginLangSelector');
+    if (loginLangSel && loginLangSel.value !== currentLang) loginLangSel.value = currentLang;
 }
 
 // Configurar el área de subida de Excel

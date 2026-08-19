@@ -10,11 +10,16 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-<body>
     <!-- Centered Login Screen (hidden by default) -->
     <div class="login-container" id="loginContainer" style="display: none;">
         <div class="login-card">
-            <div class="login-card-header">
+            <div class="login-card-header" style="position: relative;">
+                <div class="login-lang-box" style="position: absolute; top: 12px; right: 14px;">
+                    <select id="loginLangSelector" onchange="setLanguage(this.value)" style="background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; outline: none; backdrop-filter: blur(4px);">
+                        <option value="es" style="color: #012743; background: #ffffff;">🇪🇸 Español</option>
+                        <option value="en" style="color: #012743; background: #ffffff;">🇺🇸 English</option>
+                    </select>
+                </div>
                 <div class="login-emoji">🛡️</div>
                 <h2 id="loginTitle">Reliarisk SIM-Q</h2>
                 <p id="loginSubtitle">Sistema de Gestión de Integridad Estructural (API RP 2SIM)</p>
@@ -32,7 +37,7 @@
                 <button type="submit" class="btn-login" id="btnLogin">🔐 Iniciar Sesión</button>
                 <div class="login-error-msg" id="loginErrorMsg" style="display: none;"></div>
             </form>
-            <div class="login-footer">
+            <div class="login-footer" id="loginFooter">
                 Plataforma Segura Grupo Reliarisk Software &copy; 2026<br>
                 <i>API RP 2SIM Structural Integrity Management Module</i>
             </div>
