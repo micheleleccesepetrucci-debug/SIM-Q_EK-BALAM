@@ -257,7 +257,7 @@ def get_base64_image(image_path):
 
 # Compilar aplicación HTML/JS/CSS en un archivo único autocontenido para el iframe
 @st.cache_data
-def compile_interactive_app_v6(lang):
+def compile_interactive_app_v7(lang):
     html_path = "app/index.html"
     css_path = "app/style.css"
     js_path = "app/app.js"
@@ -337,7 +337,7 @@ tab_simulator, tab_report = st.tabs([
 
 # --- PESTAÑA 1: SIMULADOR INTERACTIVO ---
 with tab_simulator:
-    html_compiled = compile_interactive_app_v6(st.session_state.app_lang)
+    html_compiled = compile_interactive_app_v7(st.session_state.app_lang)
     
     if html_compiled is None:
         st.error(t('error_compile'))
