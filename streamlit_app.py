@@ -329,123 +329,14 @@ with header_col2:
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Crear pestañas (2 pestañas: simulador y generador de reporte) traducidas dinámicamente
-tab_simulator, tab_report = st.tabs([
-    t('tab_simulator'), 
-    t('tab_report')
-])
+# Renderizar directamente el Simulador Interactivo (única pestaña activa)
 
-# --- PESTAÑA 1: SIMULADOR INTERACTIVO ---
-with tab_simulator:
-    html_compiled = compile_interactive_app_v7(st.session_state.app_lang)
-    
-    if html_compiled is None:
-        st.error(t('error_compile'))
-    else:
-        # Renderizar la aplicación en un iframe de ancho completo
-        components.html(html_compiled, height=880, scrolling=True)
+# --- SIMULADOR INTERACTIVO (vista principal) ---
+html_compiled = compile_interactive_app_v7(st.session_state.app_lang)
 
-# --- PESTAÑA 2: GENERADOR DE REPORTE TÉCNICO ---
-with tab_report:
-    st.markdown(f"""
-    <div class="panel-card">
-        <h3>{t('report_card_title')}</h3>
-        <p>{t('report_card_desc')}</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([1, 1], gap="medium")
-    
-    with col1:
-        st.markdown(f"""
-        <div class="panel-card" style="height: 100%;">
-            <h3>{t('template_title')}</h3>
-            <p>{t('template_desc')}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        excel_template_path = "Base de datos Plataformas EK Balam.xlsx"
-        if os.path.exists(excel_template_path):
-            with open(excel_template_path, "rb") as f:
-                bytes_data = f.read()
-            st.download_button(
-                label=t('template_btn'),
-                data=bytes_data,
-                file_name="Base de datos Plataformas EK Balam.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-        else:
-            st.warning(t('template_missing'))
-            
-        st.markdown(f"""
-        <br>
-        <div style="font-size: 13px; color: #64748b; line-height: 1.4;">
-            {t('instructions_title')}<br>
-            {t('instructions_body')}
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown(f"""
-        <div class="panel-card" style="height: 100%;">
-            <h3>{t('upload_title')}</h3>
-            <p>{t('upload_desc')}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        uploaded_file = st.file_uploader(
-            t('upload_label'), 
-            type=["xlsx"],
-            help=t('upload_help')
-        )
-        
-        btn_generate = st.button(t('btn_generate'))
-        
-        if btn_generate:
-            with st.spinner(t('spinner')):
-                try:
-                    # Crear archivos temporales seguros para evitar colisiones entre usuarios
-                    temp_excel_fd, temp_excel_path = tempfile.mkstemp(suffix=".xlsx")
-                    os.close(temp_excel_fd)
-                    
-                    temp_docx_fd, temp_docx_path = tempfile.mkstemp(suffix=".docx")
-                    os.close(temp_docx_fd)
-                    
-                    # Guardar archivo subido en ruta temporal o usar la plantilla por defecto si no se cargó nada
-                    if uploaded_file is not None:
-                        with open(temp_excel_path, "wb") as f:
-                            f.write(uploaded_file.getbuffer())
-                    else:
-                        if os.path.exists(excel_template_path):
-                            with open(temp_excel_path, "wb") as f:
-                                with open(excel_template_path, "rb") as template_f:
-                                    f.write(template_f.read())
-                        else:
-                            raise FileNotFoundError(t('error_no_excel'))
-                    
-                    # Llamar al generador de reportes pasándole las rutas dinámicas
-                    generar_reporte.main(
-                        excel_path=temp_excel_path,
-                        json_path="preguntas_y_opciones.json",
-                        output_filename=temp_docx_path
-                    )
-                    
-                    # Leer el reporte generado
-                    with open(temp_docx_path, "rb") as f:
-                        docx_bytes = f.read()
-                        
-                    # Limpiar archivos temporales
-                    os.remove(temp_excel_path)
-                    os.remove(temp_docx_path)
-                    
-                    st.success(t('success'))
-                    st.download_button(
-                        label=t('download_report_btn'),
-                        data=docx_bytes,
-                        file_name="Reporte_Integridad_Estructural_Ek_Balam.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
-                except Exception as e:
-                    st.error(f"{t('error_prefix')} {str(e)}")
-
+if html_compiled is None:
+    st.error(t('error_compile'))
+else:
+    # Renderizar la aplicación en un iframe de ancho completo
+    components.html(html_compiled, height=880, scrolling=True)
 
